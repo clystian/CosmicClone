@@ -74,10 +74,12 @@ namespace CosmosCloneCommon.Utility
         public static NameValueCollection GetConfigurationSection(string sectionName)
         {
             var appSettings = ConfigurationManager.GetSection(sectionName) as NameValueCollection;
-            if (appSettings.Count == 0)
+
+            if (appSettings == null || appSettings.Count == 0)
             {
-                logger.LogInfo($"Application Settings are not defined for {sectionName}");
+                logger.LogInfo($"Application Settings are {(appSettings == null ? "not defined" : "empty")} for {sectionName}");
             }
+
             return appSettings;
         }
         public static string AppSettings(string key)
