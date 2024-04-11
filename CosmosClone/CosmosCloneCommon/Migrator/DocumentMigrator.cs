@@ -4,20 +4,22 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+
+using CosmosCloneCommon.Model;
+using CosmosCloneCommon.Utility;
+
+using Microsoft.Azure.CosmosDB.BulkExecutor.BulkImport;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
-using System.Diagnostics;
-using Microsoft.Azure.CosmosDB.BulkExecutor;
-using Microsoft.Azure.CosmosDB.BulkExecutor.BulkImport;
 using Microsoft.Azure.Documents.Linq;
-using CosmosCloneCommon.Utility;
-using CosmosCloneCommon.Model;
+
 using Newtonsoft.Json;
-using logger = CosmosCloneCommon.Utility.CloneLogger;
 using Newtonsoft.Json.Linq;
+
+using logger = CosmosCloneCommon.Utility.CloneLogger;
 
 namespace CosmosCloneCommon.Migrator
 {
@@ -25,11 +27,11 @@ namespace CosmosCloneCommon.Migrator
     {
         #region declare variables
         protected int ReadDelaybetweenRequestsInMs = 2000;
-        
+
         protected CosmosDBHelper cosmosHelper;
         protected CosmosBulkImporter cosmosBulkImporter;
         protected DocumentClient sourceClient;
-        
+
         protected DocumentClient targetClient;
 
         protected DocumentCollection sourceCollection;
@@ -69,7 +71,7 @@ namespace CosmosCloneCommon.Migrator
                 }
                 else if (IsInitialized) return 100;
                 else return 0;
-            }            
+            }
         }
 
         #endregion
@@ -100,13 +102,13 @@ namespace CosmosCloneCommon.Migrator
                     var result = await dcs.StartScrub(noFilterScrubRules);
                 }
             }
-            
+
             if (CloneSettings.ScrubbingRequired && filteredScrubRules != null && filteredScrubRules.Count > 0)
             {
                 var dcs = new DataScrubMigrator();
                 var result = await dcs.StartScrub(filteredScrubRules);
             }
-            
+
             logger.LogScrubRulesInformation(DocumentMigrator.scrubRules);
 
             if (CloneSettings.CopyStoredProcedures) { await CopyStoredProcedures(); }
@@ -127,8 +129,8 @@ namespace CosmosCloneCommon.Migrator
             sourceCollection = await cosmosHelper.GetSourceDocumentCollection(sourceClient);
 
             targetClient = cosmosHelper.GetTargetDocumentDbClient();
-            var indexPolicy = (CloneSettings.CopyIndexingPolicy)? sourceCollection.IndexingPolicy : new IndexingPolicy();
-            targetCollection = await cosmosHelper.CreateTargetDocumentCollection(targetClient, indexPolicy, sourceCollection.PartitionKey);         
+            var indexPolicy = (CloneSettings.CopyIndexingPolicy) ? sourceCollection.IndexingPolicy : new IndexingPolicy();
+            targetCollection = await cosmosHelper.CreateTargetDocumentCollection(targetClient, indexPolicy, sourceCollection.PartitionKey);
 
             if (CloneSettings.CopyDocuments)
             {
@@ -148,7 +150,7 @@ namespace CosmosCloneCommon.Migrator
                 filteredScrubRules = new List<ScrubRule>();
                 foreach (var sRule in scrubRules)
                 {
-                    if(string.IsNullOrEmpty(sRule.FilterCondition))
+                    if (string.IsNullOrEmpty(sRule.FilterCondition))
                     {
                         sRule.RecordsByFilter = TotalRecordsInSource;
                         noFilterScrubRules.Add(sRule);
@@ -161,8 +163,8 @@ namespace CosmosCloneCommon.Migrator
                 }
             }
         }
-        
-        public async Task ReadUploadInBatches(IDocumentQuery<dynamic> query) 
+
+        public async Task ReadUploadInBatches(IDocumentQuery<dynamic> query)
         {
 
             #region batchVariables
@@ -192,13 +194,13 @@ namespace CosmosCloneCommon.Migrator
                 var scrubbedEntities = strEntities;
                 if (entities.Any())
                 {
-                    if( noFilterScrubRules == null || noFilterScrubRules.Count==0)
-                    {                        
+                    if (noFilterScrubRules == null || noFilterScrubRules.Count == 0)
+                    {
                         uploadResponse = await cosmosBulkImporter.BulkSendToNewCollection<dynamic>(entities);
                     }
                     else
                     {
-                        var jEntities = new List<JToken>();                        
+                        var jEntities = new List<JToken>();
                         foreach (var sRule in noFilterScrubRules)
                         {
                             jEntities = objectScrubber.ScrubObjectList(scrubbedEntities, sRule);
@@ -212,7 +214,7 @@ namespace CosmosCloneCommon.Migrator
                         }
                         var objDocuments = jEntities.Cast<Object>().ToList();
                         uploadResponse = await cosmosBulkImporter.BulkSendToNewCollection<dynamic>(objDocuments);
-                    }                    
+                    }
                 }
                 else
                 {
@@ -270,7 +272,7 @@ namespace CosmosCloneCommon.Migrator
             try
             {
                 while (query.HasMoreResults && entities.Count < CloneSettings.WriteBatchSize)
-                {                    
+                {
                     attempts++;
                     var prevRecordCount = entities.Count;
                     var res = await query.ExecuteNextAsync();

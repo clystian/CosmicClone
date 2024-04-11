@@ -4,10 +4,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
+
 using CosmosCloneCommon.Model;
 
 namespace CosmosCloneCommon.Utility
@@ -24,7 +22,7 @@ namespace CosmosCloneCommon.Utility
         {
             get
             {
-               return _logBuilder.ToString();
+                return _logBuilder.ToString();
             }
         }
 
@@ -36,7 +34,7 @@ namespace CosmosCloneCommon.Utility
         public static void LogInfo(string info)
         {
             Console.WriteLine(info);
-            _logBuilder.Append("\n"+info);
+            _logBuilder.Append("\n" + info);
         }
 
         public static void LogError(string s)
@@ -54,13 +52,13 @@ namespace CosmosCloneCommon.Utility
 
         public static void LogScrubRulesInformation(List<ScrubRule> scrubRules)
         {
-            if (scrubRules!=null && scrubRules.Count>0 && CloneSettings.ScrubbingRequired)
-            { 
-                long totalRecords=0;
+            if (scrubRules != null && scrubRules.Count > 0 && CloneSettings.ScrubbingRequired)
+            {
+                long totalRecords = 0;
                 foreach (var rule in scrubRules)
                 {
                     LogInfo($"Rule Id: {rule.RuleId}. Attribute: {rule.PropertyName}");
-                    LogInfo($"Rule filter:{(string.IsNullOrEmpty(rule.FilterCondition) ? "None":rule.FilterCondition)}");
+                    LogInfo($"Rule filter:{(string.IsNullOrEmpty(rule.FilterCondition) ? "None" : rule.FilterCondition)}");
                     LogInfo($"Rule Type: {rule.Type.ToString()}");
                     LogInfo($"Records by filter: {rule.RecordsByFilter}. Records updated: {rule.RecordsUpdated}");
                     totalRecords += rule.RecordsUpdated;

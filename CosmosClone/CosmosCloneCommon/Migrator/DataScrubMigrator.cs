@@ -4,19 +4,22 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
 using System.Threading.Tasks;
+
+using CosmosCloneCommon.Model;
+using CosmosCloneCommon.Utility;
+
+using Microsoft.Azure.CosmosDB.BulkExecutor.BulkImport;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
-using System.Diagnostics;
-using Microsoft.Azure.CosmosDB.BulkExecutor.BulkImport;
 using Microsoft.Azure.Documents.Linq;
-using CosmosCloneCommon.Utility;
-using CosmosCloneCommon.Model;
-using logger = CosmosCloneCommon.Utility.CloneLogger;
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
+using logger = CosmosCloneCommon.Utility.CloneLogger;
 
 namespace CosmosCloneCommon.Migrator
 {
@@ -67,9 +70,9 @@ namespace CosmosCloneCommon.Migrator
                 ScrubDataFetchQuery = cosmosHelper.GetScrubDataDocumentQuery<string>(targetClient, filterCondition, CloneSettings.ReadBatchSize);
                 await ReadUploadInBatches((IDocumentQuery<string>)ScrubDataFetchQuery, sRules);
 
-                foreach(var srule in DataScrubMigrator.scrubRules)
+                foreach (var srule in DataScrubMigrator.scrubRules)
                 {
-                    if(srule.FilterCondition.Equals(filterCondition))
+                    if (srule.FilterCondition.Equals(filterCondition))
                     {
                         srule.IsComplete = true;
                         srule.RecordsByFilter = filterRecordCount;
@@ -86,7 +89,7 @@ namespace CosmosCloneCommon.Migrator
             targetClient = cosmosHelper.GetTargetDocumentDbClient();
             targetCollection = await cosmosHelper.GetTargetDocumentCollection(targetClient);
             await cosmosBulkImporter.InitializeBulkExecutor(targetClient, targetCollection);
-        }      
+        }
 
         public async Task ReadUploadInBatches(IDocumentQuery<string> query, List<ScrubRule> scrubRules)
         {
@@ -121,17 +124,17 @@ namespace CosmosCloneCommon.Migrator
                         }
                         scrubbedEntities = nentities;
                         scrubRule.RecordsUpdated += jEntities.Count;
-                    }                       
+                    }
                     var objEntities = jEntities.Cast<Object>().ToList();
                     try
                     {
                         uploadResponse = await cosmosBulkImporter.BulkSendToNewCollection<dynamic>(objEntities);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         logger.LogError(ex);
-                        throw;                        
-                    }                                    
+                        throw;
+                    }
                 }
                 badEntities = uploadResponse.BadInputDocuments;
                 TotalRecordsScrubbed += uploadResponse.NumberOfDocumentsImported;
@@ -160,9 +163,9 @@ namespace CosmosCloneCommon.Migrator
                     objEntities.AddRange((IEnumerable<object>)res);
                     logger.LogInfo($"Records retrieved from source: {objEntities.Count - prevRecordCount}");
                 }
-                foreach(var obj in objEntities)
-                {                   
-                    entities.Add(JsonConvert.SerializeObject(obj));                 
+                foreach (var obj in objEntities)
+                {
+                    entities.Add(JsonConvert.SerializeObject(obj));
                 }
                 logger.LogInfo($"Total Records retrieved from Source {entities.Count}");
                 return entities;
