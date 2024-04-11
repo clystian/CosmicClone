@@ -1,25 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using CosmicCloneUI.Models;
-using CosmosCloneCommon.Utility;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.ComponentModel;
+
 using CosmosCloneCommon.Migrator;
 using CosmosCloneCommon.Model;
+using CosmosCloneCommon.Utility;
+
 using logger = CosmosCloneCommon.Utility.CloneLogger;
 
 namespace CosmicCloneUI
@@ -69,7 +61,7 @@ namespace CosmicCloneUI
             pages[3] = dataAnonymizationPage;
             pages[4] = copyCollectionPage;
 
-            _mainFrame.Content = pages[0]; 
+            _mainFrame.Content = pages[0];
         }
 
         private void BtnClickPrevious(object sender, RoutedEventArgs e)
@@ -81,10 +73,10 @@ namespace CosmicCloneUI
         private void BtnClickNext(object sender, RoutedEventArgs e)
         {
             Page currentPage = (Page)_mainFrame.Content;
-            if(PerformAction(currentPage))
+            if (PerformAction(currentPage))
             {
                 _mainFrame.Navigate(GetNextPage(currentPage));
-            }            
+            }
         }
 
         private void BtnClickFinish(object sender, RoutedEventArgs e)
@@ -128,9 +120,9 @@ namespace CosmicCloneUI
 
         private int GetPageNumber(Page page)
         {
-            for(int i=0;i<pages.Length;i++)
+            for (int i = 0; i < pages.Length; i++)
             {
-                if(pages[i] == page)
+                if (pages[i] == page)
                 {
                     return i;
                 }
@@ -142,7 +134,7 @@ namespace CosmicCloneUI
         {
             NavigationHelper();
         }
-        
+
         private bool PerformAction(Page currentPage)
         {
             if (GetPageNumber(currentPage) == 0)
@@ -169,7 +161,7 @@ namespace CosmicCloneUI
                 CloneSettings.CopyPartitionKey = page.PKs.IsChecked.Value;
                 CloneSettings.TargetMigrationOfferThroughputRUs = int.Parse(page.OfferThroughput.Text);
 
-                return true;                
+                return true;
             }
             else if (GetPageNumber(currentPage) == 3)
             {
@@ -213,6 +205,15 @@ namespace CosmicCloneUI
             }
         }
 
+        private void DoAnotherCopy()
+        {
+            Page currentPage = pages[0];
+            _mainFrame.Navigate(currentPage);
+
+            ((ProgressBar)pages[4].FindName("ReadProgress")).Value = 0;
+            ((ProgressBar)pages[4].FindName("WriteProgress")).Value = 0;
+            ((ProgressBar)pages[4].FindName("ScrubProgress")).Value = 0;
+        }
 
         void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -221,12 +222,12 @@ namespace CosmicCloneUI
                 var documentMigrator = new CosmosCloneCommon.Migrator.DocumentMigrator();
                 documentMigrator.StartCopy(scrubRules).Wait();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.LogInfo("Main process exits with error");
                 logger.LogError(ex);
                 string excmessage = "Main process exits with error. /n" + ex.Message + "/n";
-                if(ex.InnerException!=null)
+                if (ex.InnerException != null)
                 {
                     excmessage += ex.InnerException.Message;
                 }
@@ -255,15 +256,15 @@ namespace CosmicCloneUI
             int sendPercent = 0;
             while (readPercentProgress < 100 || writePercentProgress < 100 || scrubPercentProgress < 100)
             {
-                if (DocumentMigrator.TotalRecordsInSource == 0 && CloneSettings.CopyDocuments==true)
+                if (DocumentMigrator.TotalRecordsInSource == 0 && CloneSettings.CopyDocuments == true)
                 {
                     readPercentProgress = 0;
                     writePercentProgress = 0;
-                   //scrubPercentProgress = 0;
+                    //scrubPercentProgress = 0;
                 }
                 else
                 {
-                    if(CloneSettings.CopyDocuments)
+                    if (CloneSettings.CopyDocuments)
                     {
                         readPercentProgress = (DocumentMigrator.TotalRecordsRetrieved * 100) / DocumentMigrator.TotalRecordsInSource;
                         writePercentProgress = (DocumentMigrator.TotalRecordsSent * 100) / DocumentMigrator.TotalRecordsInSource;
@@ -277,8 +278,8 @@ namespace CosmicCloneUI
                     if (CloneSettings.ScrubbingRequired && DocumentMigrator.scrubRules != null && DocumentMigrator.scrubRules.Count > 0)
                     {
                         scrubPercentProgress = DocumentMigrator.ScrubPercentProgress;
-                      
-                    }                    
+
+                    }
                     else
                     {
                         if (DocumentMigrator.scrubRules == null || DocumentMigrator.scrubRules.Count == 0) scrubPercentProgress = 100;
@@ -287,7 +288,7 @@ namespace CosmicCloneUI
 
                 }
 
-                sendPercent = (int)scrubPercentProgress * 1000000 + (int)readPercentProgress * 1000 + (int)writePercentProgress ;
+                sendPercent = (int)scrubPercentProgress * 1000000 + (int)readPercentProgress * 1000 + (int)writePercentProgress;
                 (sender as BackgroundWorker).ReportProgress((int)sendPercent);
                 Task.Delay(3000).Wait();
             }
@@ -312,24 +313,35 @@ namespace CosmicCloneUI
 
         void Worker_RunWorkerCompleted2(object sender, RunWorkerCompletedEventArgs e)
         {
-            while(!DocumentMigrator.IsCodeMigrationComplete)
+            while (!DocumentMigrator.IsCodeMigrationComplete)
             {
                 Task.Delay(5000).Wait();
-            }            
-            if(DocumentMigrator.IsCodeMigrationComplete)
+            }
+            if (DocumentMigrator.IsCodeMigrationComplete)
             {
                 string completeMessage = DocumentMigrator.TotalRecordsSent + " Documents Copied Successfully";
                 completeMessage += "\n" + "Code Migration Complete";
-                if (DocumentMigrator.scrubRules!=null && DocumentMigrator.scrubRules.Count>0)
+                if (DocumentMigrator.scrubRules != null && DocumentMigrator.scrubRules.Count > 0)
                 {
                     completeMessage += "\n" + "Scrubbing completed for rules " + DocumentMigrator.scrubRules.Count;
                 }
-                
+
                 MessageBox.Show(completeMessage, "Completed", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                btn_finish.IsEnabled = true;
+                string copyMoreMessage = "Would you like to copy additional collections?";
+                var wantToCopyMore = MessageBox.Show(copyMoreMessage, "Copy more?", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                switch (wantToCopyMore)
+                {
+                    case MessageBoxResult.Yes:
+                        DoAnotherCopy();
+                        break;
+                    case MessageBoxResult.Cancel:
+                    case MessageBoxResult.No:
+                    default:
+                        btn_finish.IsEnabled = true;
+                        break;
+                }
             }
         }
-
     }
 }
