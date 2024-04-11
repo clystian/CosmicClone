@@ -4,15 +4,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CosmosCloneCommon;
+
 using CosmosCloneCommon.Migrator;
 using CosmosCloneCommon.Model;
-using CosmosCloneCommon.Utility;
+
 using logger = CosmosCloneCommon.Utility.CloneLogger;
-using Newtonsoft.Json;
 
 namespace CloneConsoleRun
 {
@@ -72,8 +68,8 @@ namespace CloneConsoleRun
             var documentMigrator = new CosmosCloneCommon.Migrator.DocumentMigrator();
             documentMigrator.StartCopy(scrubRules).Wait();
             //var result = tcs.StartScrub(scrubRules);
-        }    
+        }
 
-     
+
     }
 }

@@ -5,10 +5,11 @@ namespace CloneConsoleRun.Sample
 {
     using System;
     using System.Collections.Generic;
+
     using CosmosCloneCommon.Model;
 
     public class EntityV2
-    {        
+    {
         public string FullName { get; set; }
         public string Description { get; set; }
         public Boolean IsActive { get; set; }
@@ -30,7 +31,7 @@ namespace CloneConsoleRun.Sample
             entity.Description = "Test Sample Description " + entity.SuperId.ToString();
             entity.EntityType = RandomNumberGenerator.GetRandomEntityType();
             var employeeid = RandomNumberGenerator.GetNext();
-            entity.EmailAddress = "intialTest"+ employeeid .ToString()+ "@test.com";
+            entity.EmailAddress = "intialTest" + employeeid.ToString() + "@test.com";
             entity.PhoneNumber = RandomNumberGenerator.GetNext().ToString();
             entity.IsActive = true;
             entity.ModifiedTime = DateTime.UtcNow;
@@ -46,7 +47,7 @@ namespace CloneConsoleRun.Sample
     }
 
 
-   
+
 
 
 

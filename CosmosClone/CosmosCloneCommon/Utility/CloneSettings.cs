@@ -2,17 +2,14 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Configuration;
 using System.Collections.Specialized;
+using System.Configuration;
+
 using logger = CosmosCloneCommon.Utility.CloneLogger;
 
 namespace CosmosCloneCommon.Utility
 {
-   
+
     public static class CloneSettings
     {
         public static bool CopyStoredProcedures { get; set; }
@@ -25,7 +22,7 @@ namespace CosmosCloneCommon.Utility
         public static int WriteBatchSize { get; private set; }
         public static bool EnableTextLogging { get; set; }
         public static bool ScrubbingRequired { get; set; }
-        
+
         public static int SourceOfferThroughputRUs { get; set; }
         public static int TargetMigrationOfferThroughputRUs { get; set; }
         public static int TargetRestOfferThroughputRUs { get; set; }
@@ -53,7 +50,7 @@ namespace CosmosCloneCommon.Utility
             TargetMigrationOfferThroughputRUs = int.Parse(ConfigurationManager.AppSettings["TargetMigrationOfferThroughputRUs"]);
             TargetRestOfferThroughputRUs = int.Parse(ConfigurationManager.AppSettings["TargetRestOfferThroughputRUs"]);
             ScrubbingRequired = bool.Parse(ConfigurationManager.AppSettings["ScrubbingRequired"]);
-            var sourceConfigs = GetConfigurationSection("SourceCosmosDBSettings"); 
+            var sourceConfigs = GetConfigurationSection("SourceCosmosDBSettings");
             SourceSettings = new CosmosCollectionValues()
             {
                 EndpointUrl = sourceConfigs["EndpointUrl"],

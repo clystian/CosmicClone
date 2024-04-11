@@ -7,12 +7,14 @@ namespace CloneConsoleRun.Sample
 {
     using System;
     using System.Threading.Tasks;
+
     using CosmosCloneCommon.Utility;
+
     using Microsoft.Azure.Documents;
     using Microsoft.Azure.Documents.Client;
 
     public class CosmosSampleDBHelper
-    {        
+    {
         private ConnectionPolicy ConnectionPolicy;
         public CosmosSampleDBHelper()
         {
@@ -25,7 +27,7 @@ namespace CloneConsoleRun.Sample
             this.ConnectionPolicy.RetryOptions.MaxRetryAttemptsOnThrottledRequests = 20;
             this.ConnectionPolicy.RetryOptions.MaxRetryWaitTimeInSeconds = 600;
         }
-        
+
         public DocumentClient GetSampleDocumentDbClient()
         {
             try
@@ -68,7 +70,7 @@ namespace CloneConsoleRun.Sample
                     //no partition key if it is a fixed collection
                     newDocumentCollection = (DocumentCollection)await sampleClient.CreateDocumentCollectionIfNotExistsAsync
                                            (UriFactory.CreateDatabaseUri(sampleDatabaseName),
-                                           new DocumentCollection { Id = sampleCollectionName},
+                                           new DocumentCollection { Id = sampleCollectionName },
                                            new RequestOptions { OfferThroughput = offerThroughput });
                 }
                 return newDocumentCollection;
@@ -90,22 +92,22 @@ namespace CloneConsoleRun.Sample
 
                 await targetClient.CreateDatabaseIfNotExistsAsync(new Database { Id = targetDatabaseName });
                 DocumentCollection newDocumentCollection;
-                if (partitionKeyDefinition != null && partitionKeyDefinition.Paths.Count>0)
+                if (partitionKeyDefinition != null && partitionKeyDefinition.Paths.Count > 0)
                 {
-                    if(CloneSettings.CopyPartitionKey)
-                    { 
-                    // Partition key exists in Source (Unlimited Storage)
-                    newDocumentCollection = (DocumentCollection)await targetClient.CreateDocumentCollectionIfNotExistsAsync
-                                        (UriFactory.CreateDatabaseUri(targetDatabaseName),
-                                        new DocumentCollection { Id = targetCollectionName, PartitionKey = partitionKeyDefinition, IndexingPolicy = indexingPolicy },
-                                        new RequestOptions { OfferEnableRUPerMinuteThroughput = true, OfferThroughput = CloneSettings.TargetMigrationOfferThroughputRUs });
+                    if (CloneSettings.CopyPartitionKey)
+                    {
+                        // Partition key exists in Source (Unlimited Storage)
+                        newDocumentCollection = (DocumentCollection)await targetClient.CreateDocumentCollectionIfNotExistsAsync
+                                            (UriFactory.CreateDatabaseUri(targetDatabaseName),
+                                            new DocumentCollection { Id = targetCollectionName, PartitionKey = partitionKeyDefinition, IndexingPolicy = indexingPolicy },
+                                            new RequestOptions { OfferEnableRUPerMinuteThroughput = true, OfferThroughput = CloneSettings.TargetMigrationOfferThroughputRUs });
                     }
                     else
                     {
-                    newDocumentCollection = (DocumentCollection)await targetClient.CreateDocumentCollectionIfNotExistsAsync
-                                         (UriFactory.CreateDatabaseUri(targetDatabaseName),
-                                         new DocumentCollection { Id = targetCollectionName,  IndexingPolicy = indexingPolicy },
-                                         new RequestOptions { OfferEnableRUPerMinuteThroughput = true, OfferThroughput = CloneSettings.TargetMigrationOfferThroughputRUs });
+                        newDocumentCollection = (DocumentCollection)await targetClient.CreateDocumentCollectionIfNotExistsAsync
+                                             (UriFactory.CreateDatabaseUri(targetDatabaseName),
+                                             new DocumentCollection { Id = targetCollectionName, IndexingPolicy = indexingPolicy },
+                                             new RequestOptions { OfferEnableRUPerMinuteThroughput = true, OfferThroughput = CloneSettings.TargetMigrationOfferThroughputRUs });
                     }
                 }
                 else
@@ -124,6 +126,6 @@ namespace CloneConsoleRun.Sample
                 throw;
             }
         }
-   
+
     }
 }

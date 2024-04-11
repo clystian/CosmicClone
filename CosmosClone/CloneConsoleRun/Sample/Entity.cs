@@ -6,6 +6,7 @@ namespace CloneConsoleRun.Sample
 {
     using System;
     using System.Collections.Generic;
+
     using CosmosCloneCommon.Model;
 
     public class Entity
@@ -99,9 +100,9 @@ namespace CloneConsoleRun.Sample
             testEntity.Words.Add("rex123");
             return testEntity;
         }
-           }
+    }
 
-    
+
 
 
 

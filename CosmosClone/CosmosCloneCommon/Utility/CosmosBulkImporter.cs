@@ -4,13 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
+
 using Microsoft.Azure.CosmosDB.BulkExecutor;
 using Microsoft.Azure.CosmosDB.BulkExecutor.BulkImport;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+
 using logger = CosmosCloneCommon.Utility.CloneLogger;
 
 namespace CosmosCloneCommon.Utility

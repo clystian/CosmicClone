@@ -12,7 +12,9 @@ namespace CloneConsoleRun.Sample
     using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
+
     using CosmosCloneCommon.Utility;
+
     using Microsoft.Azure.CosmosDB.BulkExecutor.BulkImport;
     using Microsoft.Azure.Documents;
     using Microsoft.Azure.Documents.Client;
@@ -33,7 +35,7 @@ namespace CloneConsoleRun.Sample
         public SampleDBCreator()
         {
             cosmosHelper = new CosmosSampleDBHelper();
-            cosmosBulkImporter = new CosmosBulkImporter();            
+            cosmosBulkImporter = new CosmosBulkImporter();
         }
 
         public async Task InitializeMigration()
@@ -53,7 +55,7 @@ namespace CloneConsoleRun.Sample
         protected List<dynamic> GetCommonEntitiesinBatch()
         {
             List<dynamic> entities = new List<dynamic>();
-            for(int i=0; i<this.WriteBatchSize; i++)
+            for (int i = 0; i < this.WriteBatchSize; i++)
             {
                 entities.Add(EntityV2.getRandomEntity());
             }

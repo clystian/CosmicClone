@@ -4,8 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json.Linq;
+
 using CosmosCloneCommon.Model;
+
+using Newtonsoft.Json.Linq;
 
 namespace CosmosCloneCommon.Utility
 {
@@ -16,7 +18,7 @@ namespace CosmosCloneCommon.Utility
             //var scrubbedObjects = new List<string>();
             var scrubbedObjects = new List<JToken>();
             var propNames = scrubRule.PropertyName.Split('.').ToList();
-            if(scrubRule.Type == RuleType.NullValue || scrubRule.Type == RuleType.SingleValue || scrubRule.Type == RuleType.PartialMaskFromLeft || scrubRule.Type == RuleType.PartialMaskFromRight)
+            if (scrubRule.Type == RuleType.NullValue || scrubRule.Type == RuleType.SingleValue || scrubRule.Type == RuleType.PartialMaskFromLeft || scrubRule.Type == RuleType.PartialMaskFromRight)
             {
                 foreach (var strObj in srcList)
                 {
@@ -25,16 +27,16 @@ namespace CosmosCloneCommon.Utility
                         JToken jToken = GetUpdatedJsonArrayValue((JToken)JObject.Parse(strObj), propNames, scrubRule.UpdateValue, scrubRule.Type);
                         scrubbedObjects.Add(jToken);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         CloneLogger.LogInfo("Log failed");
                         CloneLogger.LogError(ex);
-                        throw ;
+                        throw;
                     }
-                   
+
                 }
             }
-            else if(scrubRule.Type == RuleType.Shuffle)
+            else if (scrubRule.Type == RuleType.Shuffle)
             {
                 //get all similar values
                 var propertyValues = new List<JToken>();
@@ -50,11 +52,11 @@ namespace CosmosCloneCommon.Utility
                     {
                         CloneLogger.LogInfo("Log failed");
                         CloneLogger.LogError(ex);
-                        throw ;
+                        throw;
                     }
-                   
+
                 }
-                
+
                 var shuffledTokens = RandomNumberGenerator.Shuffle(propertyValues);
                 var shuffledTokenQ = new Queue<JToken>(shuffledTokens);
 
@@ -69,7 +71,7 @@ namespace CosmosCloneCommon.Utility
                     {
                         CloneLogger.LogInfo("Log failed");
                         CloneLogger.LogError(ex);
-                        throw ;
+                        throw;
                     }
                 }
             }
@@ -80,13 +82,13 @@ namespace CosmosCloneCommon.Utility
                     scrubbedObjects.Add((JToken)strObj);
                 }
             }
-            
+
             return scrubbedObjects;
         }
 
         public List<JToken> GetPropertyValues(JToken token, List<string> propNames, ref List<JToken> jTokenList)
-        {            
-            if(jTokenList == null)
+        {
+            if (jTokenList == null)
             {
                 jTokenList = new List<JToken>();
             }
@@ -94,7 +96,7 @@ namespace CosmosCloneCommon.Utility
 
             bool isLeaflevel = false;
 
-            if(propNames.Count > 1)
+            if (propNames.Count > 1)
             {
                 if (propNames.Count == 2) isLeaflevel = true;
                 var currentProperty = propNames[1];
@@ -143,7 +145,7 @@ namespace CosmosCloneCommon.Utility
                     }
                 }
 
-            } 
+            }
             return jTokenList;
         }
         public JToken GetDocumentShuffledToken(JToken token, List<string> propNames, ref Queue<JToken> tokenQ)
@@ -197,7 +199,7 @@ namespace CosmosCloneCommon.Utility
                     var str3 = jObj.ToString();
                     jTokenResult = (JToken)jObj;
                 }
-            }               
+            }
             if (jTokenResult == null)
             {
                 jTokenResult = token;
@@ -209,7 +211,7 @@ namespace CosmosCloneCommon.Utility
         {
             if (token == null || token.Type == JTokenType.Null) return null;
 
-            JToken jTokenResult=token;//just to initialize
+            JToken jTokenResult = token;//just to initialize
             bool isLeaflevel = false;
 
             if (propNames.Count > 1)
@@ -267,13 +269,13 @@ namespace CosmosCloneCommon.Utility
                 }
             }
 
-            if(jTokenResult == null)
+            if (jTokenResult == null)
             {
                 jTokenResult = token;
             }
             return jTokenResult;
         }
-        
+
         private JToken ScrubTokenValue(RuleType? ruleType, JToken tokenToBeScrubbed, string overwriteValue)
         {
             if (ruleType.HasValue)
