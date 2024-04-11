@@ -42,7 +42,7 @@ namespace CosmosCloneCommon.Migrator
         {
             //initialize settings and other utilities
             var SourceCosmosDBSettings = CloneSettings.GetConfigurationSection("SourceCosmosDBSettings");
-            SourceEndpointUrl = CloneSettings.SourceSettings.EndpointUrl; ;
+            SourceEndpointUrl = CloneSettings.SourceSettings.EndpointUrl;
             SourceAccessKey = CloneSettings.SourceSettings.AccessKey;
             sourceDatabaseName = CloneSettings.SourceSettings.DatabaseName;
             sourceCollectionName = CloneSettings.SourceSettings.CollectionName;
