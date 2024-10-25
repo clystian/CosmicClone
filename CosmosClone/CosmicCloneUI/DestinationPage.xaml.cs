@@ -5,8 +5,9 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
-
+using CosmicCloneUI.Extensions;
 using CosmosCloneCommon.Utility;
+using Microsoft.Win32;
 
 namespace CosmicCloneUI
 {
@@ -52,6 +53,41 @@ namespace CosmicCloneUI
                 ConnectionTestMsg.Text = result.Message;
             }
             return result.IsSuccess;
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        { 
+            var settings = new CosmosCollectionValues
+            {
+                EndpointUrl = TargetURL.Text.Encrypt(),
+                AccessKey = TargetKey.Text.Encrypt(),
+                DatabaseName = TargetDB.Text.Encrypt(),
+                CollectionName = TargetCollection.Text.Encrypt()
+            };
+            
+            new SaveFileDialog().SaveFile(Environment.SpecialFolder.MyDocuments, "Target", settings);
+        }
+
+        private void LoadButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog();
+
+            try
+            {
+                var settings = dialog.LoadFile<CosmosCollectionValues>(Environment.SpecialFolder.MyDocuments, "Target");
+
+                if (settings != null)
+                {
+                    TargetURL.Text = settings.EndpointUrl.Decrypt();
+                    TargetKey.Text = settings.AccessKey.Decrypt();
+                    TargetDB.Text = settings.DatabaseName.Decrypt();
+                    TargetCollection.Text = settings.CollectionName.Decrypt();
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show($"Unable to load Target from file: {dialog.FileName}", $"Failed to load Target", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
     }
 }
